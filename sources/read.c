@@ -67,8 +67,8 @@ if ((ft_strcmp(data_name, "SPHERE") == 0) && data->sphere->nbr < 30)
 	parse_obj(line, data, 0, "scene");
 	else if (ft_strcmp(data_name, "CAMERA") == 0)
 		parse_obj(line, data, 0, "camera");
-	//else if ((ft_strcmp(data_name, "MODEL") == 0) && data->model->nbr < 5)
-		//parse_obj(line, data, &data->model->nbr, "model");
+	else if ((ft_strcmp(data_name, "MODEL") == 0) && data->model->nbr < 5)
+		parse_obj(line, data, &data->model->nbr, "model");
 	//else if (ft_strcmp(data_name, "TEXTURE") == 0)
 		//parse_texture(line, data);
 }
@@ -90,6 +90,7 @@ if ((fd = open(data->scene_name, O_RDONLY)) > 0)
 		wrong_scene_name();
 	if (!(data->obj_name = (char *)malloc((sizeof(char) * (8 + 1)))))
 		memory_allocation_fail();
+			
 	x = 0;
 	i = 0;
 	while ((get_next_line(fd, &line)) == 1)
@@ -104,12 +105,15 @@ if ((fd = open(data->scene_name, O_RDONLY)) > 0)
 		if (line[i] != '*')
 			free(line);
 	}
+	
 	close(fd);
 free(data->obj_name);
+init_obj(data);
+//init_obj(data);
 init_mlx(data);
 init_scene(data);
+
 	ft_putendl("moikka");
-//	data->obj = init_obj(data->obj);
 	ft_putendl("moikka");
 	draw(data);
 	//pthread(data);

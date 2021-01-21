@@ -26,7 +26,7 @@ int		main(int argc, char **argv)
 	data->scene_name = argv[1];
 		mlx_ptr = mlx_init();
 		data->mlx = mlx_ptr;
-		data->obj = init_obj(data->obj);
+		
 	
 	read_scene(data);
 	

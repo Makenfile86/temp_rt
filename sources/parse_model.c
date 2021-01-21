@@ -2,7 +2,7 @@
 #include "stdio.h"
 
 
- static void    read_obj(t_obj *obj, int fd)
+ static void  read_obj(t_obj *obj, int fd)
 {
     //int     fd;
 
@@ -32,10 +32,10 @@ i = 0;
 		free(line);
 
 	}
-	close(fd);
+	
 malloc_obj(obj, obj->num_geometry, obj->num_coordinates);
 malloc_obj2(obj, obj->num_normals, obj->num_polygonals);
-//return (obj);
+
 }
 
 static void	parse_poly(t_obj *obj, size_t i, char *line)
@@ -64,15 +64,15 @@ static void	parse_poly(t_obj *obj, size_t i, char *line)
 			obj->polygonals[i].no[j] = obj->normals[n - 1];
 			
 		}
-		free(tf[0]);
-		free(tf[1]);
-		free(tf);
-		free(parts[j]);
+		//free(tf[0]);
+		//free(tf[1]);
+		//free(tf);
+		//free(parts[j]);
 		//, tf[0], tf[1], tf[2], tf, parts[j]);
 		j++;
 	}
 	
-	free(parts);
+	//free(parts);
 		obj->polygonals[i].te[0] = vector_minus(obj->polygonals[i].ve[1], obj->polygonals[i].ve[0]);
 	obj->polygonals[i].te[1] = vector_minus(obj->polygonals[i].ve[2], obj->polygonals[i].ve[1]);
 	obj->polygonals[i].te[2] = vector_minus(obj->polygonals[i].ve[0], obj->polygonals[i].ve[2]);
@@ -107,7 +107,7 @@ void	malloc_obj2(t_obj *obj, size_t num_normals, size_t num_polygonals)
 	obj->polygonals = (t_vertices*)malloc(sizeof(t_vertices) * num_polygonals);
 }
 
-static void		read_obj_data(int fd, t_obj *obj)
+static void read_obj_data(int fd, t_obj *obj)
 {
 	char	*line;
 	size_t	i[4];
@@ -118,10 +118,10 @@ t_vector rotate;
 rotate.x = 0;
 rotate.y = 0;
 rotate.z = 0;
-	location.x = -10;
-	location.y = 0.3;
-	location.z = 50;
-	scale = 1;
+	location.x = -12;
+	location.y = 15;
+	location.z = 38;
+	scale = 2.88;
 //rotate.x = data->model->rot[0].x;
 //rotate.y = data->model->rot[0].y;
 //rotate.z = data->model->rot[0].z;
@@ -169,14 +169,17 @@ rotate.z = 0;
 t_vector	parse_normals(char *line)
 {
 	t_vector	vector;
-	char tmp[10];
-	char tmp2[10];
-	char tmp3[15];
+	char *tmp;
+	char *tmp2;
+	char *tmp3;
 	int	i;
 	int k;
 
 k = 0;
 	i = 1;
+tmp = (char *)malloc(sizeof(char) * 15);
+tmp2 = (char *)malloc(sizeof(char) * 15);
+tmp3 = (char *)malloc(sizeof(char) * 25);
 
 
 		while (line[i] != ' ')
@@ -185,6 +188,7 @@ k = 0;
 			i++;
 			k++;
 		}
+		tmp[k] = '\0';
 		i++;
 		k = 0;
 		while (line[i] != ' ')
@@ -193,6 +197,7 @@ k = 0;
 			i++;
 			k++;
 		}
+		tmp2[k] = '\0';
 		i++;
 		k = 0;
 		while (line[i] != '\0')
@@ -201,11 +206,14 @@ k = 0;
 			i++;
 			k++;
 		}
+		tmp3[k] = '\0';
 	
 	vector.x = atof(tmp);
 	vector.y = atof(tmp2);
 	vector.z = atof(tmp3);
-
+free(tmp3);
+free(tmp2);
+free(tmp);
 	return (vector);
 
 }
@@ -213,19 +221,25 @@ k = 0;
 t_vec2	parse_coord(char *line)
 {
 	t_vec2	vector;
-	char tmp[10];
-	char tmp2[10];
+	char *tmp;
+	char *tmp2;
 	int	i;
 	int k;
 
 	k = 0;
 	i = 1;
+	tmp = (char *)malloc(sizeof(char) * 20);
+tmp2 = (char *)malloc(sizeof(char) * 20);
+
+
+
 	while (line[i] != ' ')
 		{
 			tmp[k] = line[i];
 			i++;
 			k++;
 		}
+		tmp[k] = '\0';
 		i++;
 		k = 0;
 		while (line[i] != '\0')
@@ -234,11 +248,15 @@ t_vec2	parse_coord(char *line)
 			i++;
 			k++;
 		}
+		tmp2[k] = '\0';
 		
 	
 	
 	vector.u = atof(tmp2);
 	vector.v = atof(tmp);
+
+free(tmp2);
+free(tmp);
 	//printf("%f\n", vector.y);
 	return (vector);
 
@@ -249,11 +267,15 @@ t_vec2	parse_coord(char *line)
 t_vector	parse_geo(char *line)
 {
 	t_vector	vector;
-	char tmp[10];
-	char tmp2[10];
-	char tmp3[15];
+	char *tmp;
+	char *tmp2;
+	char *tmp3;
 	int	i;
 	int k;
+
+tmp = (char *)malloc(sizeof(char) * 15);
+tmp2 = (char *)malloc(sizeof(char) * 15);
+tmp3 = (char *)malloc(sizeof(char) * 20);
 
 k = 0;
 	i = 1;
@@ -265,6 +287,7 @@ k = 0;
 			i++;
 			k++;
 		}
+		tmp[k] = '\0';
 		i++;
 		k = 0;
 		while (line[i] != ' ')
@@ -273,6 +296,7 @@ k = 0;
 			i++;
 			k++;
 		}
+		tmp2[k] = '\0';
 		i++;
 		k = 0;
 		while (line[i] != '\0')
@@ -281,11 +305,15 @@ k = 0;
 			i++;
 			k++;
 		}
+		tmp3[k] = '\0';
 	
 	
 	vector.x = atof(tmp);
 	vector.y = atof(tmp2);
 	vector.z = atof(tmp3);
+	free(tmp3);
+free(tmp2);
+free(tmp);
 	return (vector);
 
 }
@@ -306,29 +334,30 @@ t_obj    *create_obj_data(void)
 */
 
 
-t_obj  *init_obj()
+t_data  *init_obj(t_data *data)
 {
 
- t_obj *obj;
+ //t_obj *obj;
    int fd;
 char *filename;
-       filename = "cat.obj";
+       filename = "diamond.obj";
 
-   if (!(obj = (t_obj*)malloc(sizeof(t_obj))))
-	{
-        		return (0);
-	}
+   //if (!(obj = (t_obj*)malloc(sizeof(t_obj))))
+	//{
+        		//return (0);
+	//}
 //obj = create_obj_data();
 	
 
 fd = open(filename, O_RDONLY);
-read_obj(obj, fd);
+ read_obj(data->obj, fd);
+ close (fd);
 	fd = open(filename, O_RDONLY);
 
 
 
 
-		read_obj_data(fd, obj);
+		read_obj_data(fd, data->obj);
 		
 
 
@@ -340,6 +369,6 @@ read_obj(obj, fd);
 
 		//printf("%f z\n", obj->polygonals[0].normal.z);
    
-    return (obj);
+    return (data);
 
 }

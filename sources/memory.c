@@ -34,8 +34,19 @@ t_data	*allocate_memory(t_data *data)
 		memory_allocation_fail();
 		if (!(data->model = (t_model *)malloc(sizeof(t_model))))
 		memory_allocation_fail();
-			//if (!(data->obj = (t_obj *)malloc(sizeof(t_obj))))
-		//memory_allocation_fail();
+			if (!(data->obj = (t_obj *)malloc(sizeof(t_obj))))
+			memory_allocation_fail();
+		data->obj->num_geometry = 0;
+	data->obj->geometry = NULL;
+	data->obj->num_coordinates = 0;
+	data->obj->coordinates = NULL;
+	data->obj->num_normals = 0;
+	data->obj->normals = NULL;
+	data->obj->num_polygonals = 0;
+	data->obj->polygonals = NULL;
+	//data->obj->bounds.min = ft_make_vec3(MAX_BOUNDS, MAX_BOUNDS, MAX_BOUNDS);
+	//data->obj->bounds.max = ft_make_vec3(MIN_BOUNDS, MIN_BOUNDS, MIN_BOUNDS);
+
 	return (data);
 }
 

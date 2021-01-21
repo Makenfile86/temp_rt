@@ -251,7 +251,7 @@ void		init_plane(t_data *data, int e);
 void init_sphere(t_data *data, int e);
 void			init_parsed_data(t_data *data, char *type, int e);
 void	pthread(t_data *data);
-t_obj    *init_obj();
+t_data    *init_obj(t_data *data);
 int		intersecttriangle(t_ray ray, t_data *data, int h);
 
 #endif

@@ -207,10 +207,10 @@ data->hit.mater = data->cone->mater[i];
 	}
 	if (ft_strcmp(data->hit.obj_name, "triangle") == 0)
 	{
-data->hit.mater = 1;
+data->hit.mater = 4;
 data->hit.texture.type = 0;
 	}
-		if (data->hit.mater == 3)
+		if (data->hit.mater == 4)
 			data->hit.refract = 1;
 			//if (data->hit.was_refract == 1)
 			//data->hit.was_refract = 0;
