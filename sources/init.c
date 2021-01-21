@@ -58,6 +58,7 @@ t_ray			init_pixel(t_data *data, int x, int y, t_rgb *rgb)
 	data->hit.preobj_mater = 1;
 	data->hit.mater = 1;
 	data->hit.refract = 0;
+	data->hit.was_refract = 0;
 	data->hit.refract_lent = 1200;
 	return (ray);
 }

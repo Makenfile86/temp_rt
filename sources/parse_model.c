@@ -2,26 +2,25 @@
 #include "stdio.h"
 
 
- t_obj    *read_obj(t_obj *obj)
+ static void    read_obj(t_obj *obj, int fd)
 {
-    int     fd;
+    //int     fd;
 
     int     i;
- char    *filename;
-    int     width;
-    int     height;
+ //char    *filename;
+   
     char *line;
  
 
-    height = 1000;
-    width = 1000;
+ 
 
 i = 0;
-    filename = "cat.obj";
-fd = open(filename, O_RDONLY);
+    //filename = "cat.obj";
+//fd = open(filename, O_RDONLY);
 
-	while (get_next_line(fd, &line) > 0)
+	while ((get_next_line(fd, &line)) == 1)
 	{
+	
 		if (ft_strncmp(line, "v ", 2) == 0)
 			obj->num_geometry++;
         else if (ft_strncmp(line, "vt", 2) == 0)
@@ -33,17 +32,10 @@ fd = open(filename, O_RDONLY);
 		free(line);
 
 	}
-        printf("%zu\n", obj->num_geometry);
-
-        printf("%zu\n", obj->num_coordinates);
-
-        printf("%zu\n", obj->num_normals);
-
-        printf("%zu\n", obj->num_polygonals);
 	close(fd);
 malloc_obj(obj, obj->num_geometry, obj->num_coordinates);
 malloc_obj2(obj, obj->num_normals, obj->num_polygonals);
-return (obj);
+//return (obj);
 }
 
 static void	parse_poly(t_obj *obj, size_t i, char *line)
@@ -54,27 +46,51 @@ static void	parse_poly(t_obj *obj, size_t i, char *line)
 	size_t j;
 
 	j = 0;
-ft_putendl("poo");
+
 	parts = ft_strsplit(line + 1, ' ');
 	while (parts[j] && (tf = ft_strsplit(parts[j], '/')))
 	{
 		if (!tf[0] || (n = ft_atoi(tf[0])))	
 		obj->polygonals[i].ve[j] = obj->geometry[n - 1];
 		if (!tf[1] || (n = ft_atoi(tf[1])))
-		obj->polygonals[i].uv[j] = obj->coordinates[n - 1];
+		{
+			
+			obj->polygonals[i].uv[j] = obj->coordinates[n - 1];
+			//ft_putnbr(obj->polygonals[i].no[j].z);
+		}
 		if (!tf[2] || (n = ft_atoi(tf[2])))
-		obj->polygonals[i].no[j] = obj->normals[n - 1];
-		//free_null(5, tf[0], tf[1], tf[2], tf, parts[j]);
+		{
+			
+			obj->polygonals[i].no[j] = obj->normals[n - 1];
+			
+		}
+		free(tf[0]);
+		free(tf[1]);
+		free(tf);
+		free(parts[j]);
+		//, tf[0], tf[1], tf[2], tf, parts[j]);
 		j++;
-	printf("%zu	\nj", j);
 	}
-	ft_putendl("poo2");
-	//free(parts);
-		printf("%f x\n", obj->polygonals[2].ve[1].x);
+	
+	free(parts);
+		obj->polygonals[i].te[0] = vector_minus(obj->polygonals[i].ve[1], obj->polygonals[i].ve[0]);
+	obj->polygonals[i].te[1] = vector_minus(obj->polygonals[i].ve[2], obj->polygonals[i].ve[1]);
+	obj->polygonals[i].te[2] = vector_minus(obj->polygonals[i].ve[0], obj->polygonals[i].ve[2]);
+	obj->polygonals[i].normal = obj->polygonals[i].no[0];
+	
+	//ft_putendl("tata se o");
 
-		printf("%f y\n", obj->polygonals[2].ve[1].y);
+	//triface_calc_bounds(&obj->polygonals[i]);
 
-		printf("%f z\n", obj->polygonals[2].ve[1].z);
+	//tasta puuttuu se yks funktio
+	/*
+	printf("%f x\n", obj->polygonals[0].normal.x);
+
+		printf("%f y\n", obj->polygonals[0].normal.y);
+
+		printf("%f z\n", obj->polygonals[0].normal.z);
+		*/
+		
 }
 
 void	malloc_obj(t_obj *obj, size_t num_geometry, size_t num_coordinates)
@@ -84,37 +100,68 @@ void	malloc_obj(t_obj *obj, size_t num_geometry, size_t num_coordinates)
 }
 void	malloc_obj2(t_obj *obj, size_t num_normals, size_t num_polygonals)
 {
+	//ft_putendl("poly malloc");
+//	ft_putnbr(num_polygonals);
+	//ft_putchar('\n');
 	obj->normals = (t_vector*)malloc(sizeof(t_vector) * num_normals);
 	obj->polygonals = (t_vertices*)malloc(sizeof(t_vertices) * num_polygonals);
 }
 
-void		read_obj_data(int fd, t_obj *obj)
+static void		read_obj_data(int fd, t_obj *obj)
 {
 	char	*line;
 	size_t	i[4];
-	
+	t_vector location;
+double scale;
+t_vector rotate;
+
+rotate.x = 0;
+rotate.y = 0;
+rotate.z = 0;
+	location.x = -10;
+	location.y = 0.3;
+	location.z = 50;
+	scale = 1;
+//rotate.x = data->model->rot[0].x;
+//rotate.y = data->model->rot[0].y;
+//rotate.z = data->model->rot[0].z;
+	//location.x = data->model->xyz[0].x;
+	//location.y = data->model->xyz[0].y;
+	//location.z = data->model->xyz[0].z;
+	//scale = data->model->size[0];
+
+
+
 
 	i[0] = 0;
 	i[1] = 0;
 	i[2] = 0;
 	i[3] = 0;
+	ft_putendl("moikkaskhdsahidhsia");
 	while (get_next_line(fd, &line) > 0)
 	{
+
 		if (ft_strncmp(line, "v ", 2) == 0)
-			obj->geometry[i[0]++] = parse_geo(line + 1);
+			obj->geometry[i[0]++] = vec_rot_zyx(vectorscale(scale, vectoradd(parse_geo(line + 1), location)), rotate);
 		if (ft_strncmp(line, "vt ", 2) == 0)
 			obj->coordinates[i[1]++] = parse_coord(line + 1);
 	if (ft_strncmp(line, "vn ", 2) == 0)
-			obj->normals[i[2]++] = parse_normals(line + 2);
+			obj->normals[i[2]++] = vec_rot_zyx(parse_normals(line + 2), rotate);
 	if (ft_strncmp(line, "f ", 2) == 0)
 			parse_poly(obj, i[3]++, line);
-		
+		free(line);
 		
 	}
+
+	//	printf("%f x geometry	\n", obj->geometry[2].x);
+
+	//	printf("%f y\n", obj->geometry[2].y);
+
+	//	printf("%f z\n", obj->geometry[2].z);
 	//printf("%f\n", obj->geometry[1].z);
 //printf("%f\n", obj->coordinates[1].y);
 
-ft_putendl("jee2");
+
 }
 
 
@@ -158,8 +205,7 @@ k = 0;
 	vector.x = atof(tmp);
 	vector.y = atof(tmp2);
 	vector.z = atof(tmp3);
-//printf("%f\n", vector.z);
-	//printf("%s\n", line);
+
 	return (vector);
 
 }
@@ -243,7 +289,7 @@ k = 0;
 	return (vector);
 
 }
-
+/*
 t_obj    *create_obj_data(void)
 {
     	t_obj *obj;
@@ -252,39 +298,48 @@ t_obj    *create_obj_data(void)
 	{
         		return (0);
 	}
-	obj->num_geometry = 0;
+//	obj->num_geometry = 0;
 //	m->vertices = NULL;
 
 	return (obj);
 }
+*/
 
 
-int     init_obj(void)
+t_obj  *init_obj()
 {
 
-   t_obj *obj;
+ t_obj *obj;
    int fd;
 char *filename;
        filename = "cat.obj";
 
-   
-obj = create_obj_data();
+   if (!(obj = (t_obj*)malloc(sizeof(t_obj))))
+	{
+        		return (0);
+	}
+//obj = create_obj_data();
 	
-ft_putendl("jee3");
-
-    obj = read_obj(obj);
-	ft_putendl("jee4");
 
 fd = open(filename, O_RDONLY);
-ft_putendl("jee5");
+read_obj(obj, fd);
+	fd = open(filename, O_RDONLY);
+
+
+
 
 		read_obj_data(fd, obj);
-		ft_putendl("jee6");
+		
+
 
 	close(fd);
-	ft_putendl("jee7");
 
-    
-    return (0);
+//printf("%f x\n", obj->polygonals[0].normal.x);
+
+	//printf("%f y\n", obj->polygonals[0].normal.y);
+
+		//printf("%f z\n", obj->polygonals[0].normal.z);
+   
+    return (obj);
 
 }

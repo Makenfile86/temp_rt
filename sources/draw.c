@@ -57,10 +57,10 @@ void						draw(t_data *data)
 	int				x;
 	t_color color;
 	color.channel[0] = 0;
-	y = data->start_line;
-	//y = 0;
-	while (y < data->finish_line)
-	//while (y < HEIGHT)
+	//y = data->start_line;
+	y = 0;
+	//while (y < data->finish_line)
+	while (y < HEIGHT)
 	{
 		x = 0;
 		while (x < WIDTH)

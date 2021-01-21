@@ -132,10 +132,11 @@ void texture_mapping(t_data *data, t_vector n, char *obj_name)
 {
 	int i;
 	 i = data->hit.obj_idx;
-if (ft_strcmp(obj_name, "sphere") == 0)
+		 if (ft_strcmp(obj_name, "sphere") == 0)
  data->sphere->uv[i] = spherical_map(data, n);
 if (ft_strcmp(obj_name, "plane") == 0)
    planar_map(data, n);
 if (ft_strcmp(obj_name, "cylinder") == 0)
 	cylindrical_map(data, n);
+	 
 }

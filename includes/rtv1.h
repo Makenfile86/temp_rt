@@ -80,6 +80,7 @@ typedef	struct		s_hit
 	t_vector		normal;
 	t_texturemap 	texture;
 	t_ray 			*pre_refract_ray;
+	t_vector		point;
 	int				mater;
 	int				refract;
 	int				was_refract;
@@ -149,7 +150,9 @@ typedef struct		s_data
 	t_plane			*plane;
 	t_camera		*camera;
 	t_scene			*scene;
+	t_obj			*obj;
 	t_texturemap		*texture;
+	t_model			*model;
 }					t_data;
 
 int					read_scene(t_data *data);
@@ -241,12 +244,14 @@ void		copy_spot_data(t_data *data, char *str, int x, int e);
 void		copy_cylinder_data(t_data *data, char *str, int x, int e);
 void		copy_cone_data(t_data *data, char *str, int x, int e);
 void			copy_camera_data(t_data *data, char *str, int x);
+  void		copy_model_data(t_data *data, char *str, int x, int e);
 void		init_cylinder(t_data *data, int e);
 void		init_cone(t_data *data, int e);
 void		init_plane(t_data *data, int e);
 void init_sphere(t_data *data, int e);
 void			init_parsed_data(t_data *data, char *type, int e);
 void	pthread(t_data *data);
-int     init_obj(void);
+t_obj    *init_obj();
+int		intersecttriangle(t_ray ray, t_data *data, int h);
 
 #endif

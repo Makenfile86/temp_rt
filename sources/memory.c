@@ -32,6 +32,10 @@ t_data	*allocate_memory(t_data *data)
 		memory_allocation_fail();
 			if (!(data->scene = (t_scene *)malloc(sizeof(t_scene))))
 		memory_allocation_fail();
+		if (!(data->model = (t_model *)malloc(sizeof(t_model))))
+		memory_allocation_fail();
+			//if (!(data->obj = (t_obj *)malloc(sizeof(t_obj))))
+		//memory_allocation_fail();
 	return (data);
 }
 
@@ -45,5 +49,6 @@ void	free_memory(t_data *data)
 	free(data->spot);
 	free(data->sphere);
 	free(data->texture);
+	free(data->model);
 	free(data);
 }

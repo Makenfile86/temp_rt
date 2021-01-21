@@ -50,6 +50,7 @@ void			parse_obj(char *line, t_data *data, int *obj_idx, char *type)
 	x = 0;
 	i = 0;
 	
+	
 	if (!(str = (char *)malloc(sizeof(char) * 6 + 1)))
 		memory_allocation_fail();
 	while (line[i] != '\0')

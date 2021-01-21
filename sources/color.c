@@ -12,7 +12,7 @@
 
 #include "rtv1.h"
 #include "stdio.h"
-/*
+
 static double	return_max(double a, double b)
 {
 	if (a > b)
@@ -20,8 +20,8 @@ static double	return_max(double a, double b)
 	else
 		return (b);
 }
-*/
-/*
+
+
 static double calc_fresnel(t_vector normal, t_vector target, double ior)
 {
 	t_fresnel params;
@@ -52,7 +52,7 @@ static double calc_fresnel(t_vector normal, t_vector target, double ior)
 	}
 	return (params.kr);
 }
-*/
+
 
 static t_ray		reflection_direction(t_ray ray, t_vector n, t_data *data)
 {
@@ -62,10 +62,10 @@ static t_ray		reflection_direction(t_ray ray, t_vector n, t_data *data)
 
 	if (data->hit.refract == 1)
 	{
-	data->hit.pre_refract_ray->start = vector_copy(ray.start);
-	data->hit.pre_refract_ray->target = vector_copy(ray.target);
-	data->hit.pre_refract_ray->newstart = vector_copy(ray.newstart);
-	
+	//data->hit.org_start = vector_copy(ray.start);
+		//data->hit.org_target = vector_copy(ray.target);
+
+	//ft_putendl("moikka");
 	ray.start = vector_copy(ray.newstart);
 	double etai;
 	double ior;
@@ -76,7 +76,7 @@ static t_ray		reflection_direction(t_ray ray, t_vector n, t_data *data)
 	double k;
 
 	etai = 1;
-	ior = 1.3;
+	ior = 30;
 	etat = ior;
 
 	cosi = vectordot(ray.target, n);
@@ -103,11 +103,13 @@ static t_ray		reflection_direction(t_ray ray, t_vector n, t_data *data)
 	ray.target = vectoradd(vectorscale(eta, ray.target),
 		vectorscale((eta * cosi - sqrtf(k)), n));
 	
-	data->iter += 1;
+	//data->iter += 1;
 	data->hit.refract = 0;
 	data->hit.was_refract = 1;
 	ray.target = normalized_vector(ray.target);
-
+	data->hit.org_normal = normalized_vector(data->hit.org_normal);
+	data->hit.fresnel = calc_fresnel(n, ray.target, ior);
+	//printf("%f\n", data->hit.fresnel);
 	}
 	else
 	{
@@ -117,6 +119,12 @@ static t_ray		reflection_direction(t_ray ray, t_vector n, t_data *data)
 	reflect = r_factor * vectordot(ray.target, n);
 	tmp = vectorscale(reflect, n);
 	ray.target = vector_minus(ray.target, tmp);
+	//if (data->hit.was_refract == 1)
+	//data->hit.fresnel = calc_fresnel(ray.start, ray.target, 1.5);
+	if (data->hit.was_refract == 1)
+	data->hit.was_refract = 0;
+
+
 	}
 	return (ray);
 }
@@ -124,13 +132,26 @@ static t_ray		reflection_direction(t_ray ray, t_vector n, t_data *data)
 static void			search_intersection(t_data *data, t_ray ray)
 {
 	int			i;
-
+	
+	data->objnbr = data->obj->num_polygonals;
 	i = data->objnbr - 1;
+	//i = data->obj->num_polygonals + data->objnbr - 1;
 	data->hit.obj_idx = -1;
 	data->hit.t = 1000.0;
 	data->hit.find_shadow = 0;
+	//int tmp;
+	//tmp = data->obj->num_polygonals;
+//data->objnbr = data->obj->num_polygonals;
+	//ft_putnbr(data->obj->num_polygonals);
+	//printf("%f x\n", data->obj->polygonals[0].normal.x);
+
+		//printf("%f y\n", data->obj->polygonals[0].normal.y);
+
+		//printf("%f z\n", data->obj->polygonals[0].normal.z);
+	
 	while (i >= 0)
 	{
+		
 		if (data->cylinder->nbr > i && intersectcylinder(ray, data, i) == 1)
 			set_hit(data, "cylinder", i);
 		if (data->sphere->nbr > i && intersectsphere(ray, data, i) == 1)
@@ -139,8 +160,11 @@ static void			search_intersection(t_data *data, t_ray ray)
 			set_hit(data, "plane", i);
 		if (data->cone->nbr > i && intersectcone(ray, data, i) == 1)
 			set_hit(data, "cone", i);
+		if ((int)data->obj->num_polygonals > i && intersecttriangle(ray, data, i) == 1)
+			set_hit(data, "triangle", i);
 		i--;
 	}
+	
 }
 
 static void copy_hit_data(t_data *data)
@@ -181,8 +205,16 @@ static void copy_hit_data(t_data *data)
 	{
 data->hit.mater = data->cone->mater[i];
 	}
+	if (ft_strcmp(data->hit.obj_name, "triangle") == 0)
+	{
+data->hit.mater = 1;
+data->hit.texture.type = 0;
+	}
 		if (data->hit.mater == 3)
-		data->hit.refract = 1;
+			data->hit.refract = 1;
+			//if (data->hit.was_refract == 1)
+			//data->hit.was_refract = 0;
+		
 }
 
 static t_ray		new_hit_direction(t_data *data, t_ray org_ray, t_vector *n)
@@ -193,7 +225,7 @@ static t_ray		new_hit_direction(t_data *data, t_ray org_ray, t_vector *n)
 	ray.newstart = vectornew(0, 0, 0);
 	ray.start = vector_copy(org_ray.start);
 	ray.target = vector_copy(org_ray.target);
-	if (data->iter == data->org_iter)
+	if (data->iter == data->org_iter && data->hit.was_refract != 1)
 	{
 		data->hit.org_start = vector_copy(ray.start);
 		data->hit.org_target = vector_copy(ray.target);
@@ -220,6 +252,11 @@ static t_ray		new_hit_direction(t_data *data, t_ray org_ray, t_vector *n)
 		*n = new_start_dir_plane(data, &ray);
 	if (ft_strcmp(data->hit.obj_name, "cylinder") == 0)
 		*n = new_start_dir_cylinder(data, &ray);
+		if (ft_strcmp(data->hit.obj_name, "triangle") == 0)
+		{
+			*n = data->hit.normal;
+			ray.newstart = data->hit.point;
+		}
 	copy_hit_data(data);
 	return (ray);
 }
@@ -236,7 +273,12 @@ static t_rgb		search_light_and_shadow(t_data *data, t_ray ray,
 	ray.target = vector_copy(n);
 	i = (data->spot->nbr - 1);
 		if (data->hit.texture.type > 0)
+		//{
+		//if (data->hit.was_refract == 1)
+		//texture_mapping(data, n, data->hit.preobj_name);
+		//else
 		texture_mapping(data, n, name);
+		
 	while (i >= 0)
 	{
 	if (data->iter == data->org_iter && data->scene->shadows > 0)
@@ -259,28 +301,35 @@ void				get_color(t_data *data, int x, int y)
 	t_rgb		rgb;
 	t_ray		ray;
 	
+	
 	ray = init_pixel(data, x, y, &rgb);
 	while (data->iter > 0 && data->light_scale > 0.0f)
 	{
-		if (data->hit.was_refract == 1)
-		{
-			ray.start = vector_copy(data->hit.pre_refract_ray->start);
-			ray.target = vector_copy(data->hit.pre_refract_ray->target);
-			ray.newstart = vector_copy(data->hit.pre_refract_ray->newstart);
-		}
+		//if (data->hit.was_refract == 1)
+		//{
+			//ray.start = vector_copy(data->hit.org_start);
+			//ray.target = vector_copy(data->hit.org_target);
+		//	ray.newstart = vector_copy(data->hit.pre_refract_ray->newstart);
+			//data->hit.was_refract = 0;
+		//}ft_strcmp(data->hit.preobj_name, "empty") == 0))
 		search_intersection(data, ray);
 		if (data->hit.obj_idx == -1)
 			break ;
 		ray = new_hit_direction(data, ray, &n);
 		if (n.x == 101010)
 			break ;
-		if (data->hit.refract != 1)
+	if (data->hit.mater != 3 && data->hit.mater != 4)
 		rgb = search_light_and_shadow(data, ray, n, rgb);
+		if (data->hit.mater != 3 && data->hit.mater != 4)
 		data->iter--;
+		if ((ft_strcmp(data->hit.preobj_name, "empty") != 0) && data->hit.mater == 3 && data->hit.preobj_mater != 4)
+		data->iter = 0;
 		set_old_hit(data);
 		ray = reflection_direction(ray, n, data);
-		if (data->hit.refract != 1)
+		
+		if (data->hit.was_refract != 1)
 		put_color(data, rgb, x, y);
+		//test++;
 	}
 	
 }
